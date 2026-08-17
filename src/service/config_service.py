@@ -1,19 +1,19 @@
-from src.dao.json_dao import JsonDao
+from src.dao.config_dao import ConfigDao
 from src.model.config_model import Config
 from src.util.crypt import encrypt, decrypt
 
 
 class ConfigService:
 
-    def __init__(self, json_dao: JsonDao) -> None:
-        self.json_dao = json_dao
+    def __init__(self, config_file: str) -> None:
+        self.json_dao = ConfigDao(config_file)
 
 
-    def load(self, config_file: str) -> Config:
+    def load(self) -> Config:
         conf = Config()
 
         try:
-            data = self.json_dao.load(config_file)
+            data = self.json_dao.read()
 
             conf.llmconfig.url = data['llm']['url']
             conf.llmconfig.key = None if data['llm']['key'] is None else decrypt(data['llm']['key'])
@@ -21,23 +21,23 @@ class ConfigService:
 
             conf.promptconfig = data['prompt']
         except:
-            self.save(conf, config_file)
+            self.save(conf)
 
         return conf
 
 
-    def save(self, conf: Config, config_file: str) -> None:
+    def save(self, config: Config) -> None:
         data = {
             'llm': {
-                'url': conf.llmconfig.url,
-                'key': None if conf.llmconfig.key is None else encrypt(conf.llmconfig.key),
-                'model': conf.llmconfig.model
+                'url': config.llmconfig.url,
+                'key': None if config.llmconfig.key is None else encrypt(config.llmconfig.key),
+                'model': config.llmconfig.model
             },
 
-            'user_prompt': conf.promptconfig.user_prompt,
+            'user_prompt': config.promptconfig.user_prompt,
             'bill': {
-                'category': conf.billconfig.category
+                'category': config.billconfig.category
             }
         }
 
-        self.json_dao.write(config_file, data)
+        self.json_dao.write(data)
