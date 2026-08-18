@@ -62,6 +62,13 @@ class BillList:
             self._bills.pop()
 
 
+    def __getitem__(self, index: int) -> BillRecord:
+        return self._bills[index]
+
+    def __setitem__(self, index: int, value: BillRecord) -> None:
+        self._bills[index] = value
+
+
     def __len__(self) -> int:
         return len(self._bills)
 
