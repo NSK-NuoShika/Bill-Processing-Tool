@@ -1,7 +1,8 @@
 from ast import literal_eval
 from openai import OpenAI
+from src.classifier.classifier import Classifier
 
-class LLMClassifier:
+class LLMClassifier(Classifier):
     def __init__(self,
                  url: str,
                  key: str,
@@ -17,23 +18,30 @@ class LLMClassifier:
                              max_retries = 3)
 
 
-    def classify(self, data: list[str]) -> tuple[str]:
+    def classify(self, data: list[str], category: list[str]) -> tuple[str, ...]:
         response = self.client.chat.completions.create(
             model = self.model,
             messages = [    #  type: ignore
                 {
                     'role': 'system',
-                    'content': self.sys_prompt,
+                    'content': self.sys_prompt
                 },
                 {
                     'role': 'user',
-                    'content': self.user_prompt + str(data),
+                    'content': self.user_prompt + '\n' + str(category)
+                },
+                {
+                    'role': 'user',
+                    'content': str(data)
                 }
             ],
-            temperature = 0
 
+            temperature = 0
         )
 
-        content = response.choices[0].message.content
+        res = literal_eval(response.choices[0].message.content)    # type: ignore
 
-        return literal_eval(content)    # type: ignore
+        if not isinstance(res, tuple) or len(res) != len(data):
+            raise Exception
+
+        return res
