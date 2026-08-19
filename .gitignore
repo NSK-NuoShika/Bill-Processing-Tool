@@ -1,6 +1,5 @@
 *.xlsx
 __pycache__/
 *.json
-*.txt
 .idea/
 .venv/
