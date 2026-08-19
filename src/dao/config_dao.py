@@ -4,7 +4,7 @@ from typing import Any
 
 class ConfigDao:
 
-    def __init__(self, json_file: str):
+    def __init__(self, json_file: str = "config.json") -> None:
         self.json_file = json_file
 
 

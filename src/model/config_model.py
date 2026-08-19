@@ -11,8 +11,9 @@ class LLMConfig:
 
 
 class PromptConfig:
-    def __init__(self, user_prompt: str | None = None) -> None:
+    def __init__(self, sys_prompt: str | None = None, user_prompt: str | None = None) -> None:
         self.user_prompt = user_prompt
+        self.sys_prompt = sys_prompt
 
 
 

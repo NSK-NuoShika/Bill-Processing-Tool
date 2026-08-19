@@ -1,12 +1,13 @@
 from src.dao.config_dao import ConfigDao
 from src.model.config_model import Config
 from src.util.crypt import encrypt, decrypt
+from src.resource.resource import load_sys_prompt
 
 
 class ConfigService:
 
-    def __init__(self, config_file: str) -> None:
-        self.json_dao = ConfigDao(config_file)
+    def __init__(self) -> None:
+        self.json_dao = ConfigDao()
 
 
     def load(self) -> Config:
@@ -19,7 +20,8 @@ class ConfigService:
             conf.llmconfig.key = None if data['llm']['key'] is None else decrypt(data['llm']['key'])
             conf.llmconfig.model = data['llm']['model']
 
-            conf.promptconfig = data['prompt']
+            conf.promptconfig.user_prompt = data['prompt']
+            conf.promptconfig.sys_prompt = load_sys_prompt()
         except:
             self.save(conf)
 
