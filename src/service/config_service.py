@@ -22,6 +22,8 @@ class ConfigService:
 
             conf.promptconfig.user_prompt = data['prompt']
             conf.promptconfig.sys_prompt = load_sys_prompt()
+
+            conf.billconfig.category = data['bill']['category']
         except:
             self.save(conf)
 
@@ -36,7 +38,7 @@ class ConfigService:
                 'model': config.llmconfig.model
             },
 
-            'user_prompt': config.promptconfig.user_prompt,
+            'prompt': config.promptconfig.user_prompt,
             'bill': {
                 'category': config.billconfig.category
             }

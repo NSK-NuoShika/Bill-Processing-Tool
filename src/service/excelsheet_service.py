@@ -1,6 +1,6 @@
 from typing import Iterator
-from model.bill_model import BillRecord, BillList
-from model.excelsheet_model import ExcelSheetAppendModel, ExcelSheetCreateModel, ExcelSheetReadModel
+from src.model.bill_model import BillRecord, BillList
+from src.model.excelsheet_model import ExcelSheetAppendModel, ExcelSheetCreateModel, ExcelSheetReadModel
 from src.dao.excelsheet_dao import ExcelSheetReadDao, ExcelSheetAppendDao, ExcelSheetCreateDao
 
 
@@ -25,18 +25,18 @@ class ExcelSheetReadService:
                 for _ in range(n):
                     row_lst = next(self._excelsheet_read_dao)
 
-                    time = row_lst[self._col_index[0]]
-                    party = row_lst[self._col_index[1]]
-                    product = row_lst[self._col_index[2]]
+                    time = row_lst[0]
+                    party = row_lst[1]
+                    product = row_lst[2]
 
-                    if row_lst[self._col_index[3]] == self._ty_val[0]:
+                    if row_lst[3] == self._ty_val[0]:
                         ty = -1
-                    elif row_lst[self._col_index[3]] == self._ty_val[1]:
+                    elif row_lst[3] == self._ty_val[1]:
                         ty = 0
                     else:
                         ty = 1
 
-                    value = float(row_lst[self._col_index[4]])    #type: ignore
+                    value = float(row_lst[4])    #type: ignore
 
                     bills.add(BillRecord(time, party, product, ty, value))    # type: ignore
 
@@ -81,8 +81,9 @@ class ExcelSheetCreateService(ExcelSheetWriteService):
                 ty = 'income'
 
             cate = br.category
+            value = br.value
 
-            self._excelsheet_create_dao.append([time, party, product, ty, cate])
+            self._excelsheet_create_dao.append([time, party, product, ty, value, cate])
 
 
     def save(self):
@@ -114,10 +115,13 @@ class ExcelSheetAppendService(ExcelSheetWriteService):
                 ty = 'income'
 
             cate = br.category
+            value = br.value
 
-            self._excelsheet_append_dao.append([time, party, product, ty, cate])
+            self._excelsheet_append_dao.append([time, party, product, ty, value, cate])
 
 
-    def save(self):
+    def save(self, close: bool = False):
         self._excelsheet_append_dao.save()
-        self._excelsheet_append_dao.close()
+
+        if close:
+            self._excelsheet_append_dao.close()

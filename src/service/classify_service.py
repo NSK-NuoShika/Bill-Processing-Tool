@@ -1,4 +1,4 @@
-from model.bill_model import BillList
+from src.model.bill_model import BillList
 import copy
 from src.classifier.classifier import Classifier
 

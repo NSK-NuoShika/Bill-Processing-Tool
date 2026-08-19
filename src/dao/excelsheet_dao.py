@@ -28,8 +28,6 @@ class ExcelSheetReadDao:
         ws = wb.worksheets[sheet_index]
 
         return ws.iter_rows(min_row = start_row_index + 1,
-                                      min_col = min_col_index + 1,
-                                      max_col = max_col_index + 1,
                                       values_only = True), wb
 
 
@@ -47,7 +45,7 @@ class ExcelSheetReadDao:
         res = list()
 
         for i in self._col_index:
-            res.append(row_lst[self._col_index[i]])
+            res.append(row_lst[i])
 
         return res
 
