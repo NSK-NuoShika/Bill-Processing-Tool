@@ -1,21 +1,22 @@
 from typing import Iterator
 from model.bill_model import BillRecord, BillList
+from model.excelsheet_model import ExcelSheetAppendModel, ExcelSheetCreateModel, ExcelSheetReadModel, \
+    ExcelSheetWriteModel
 from src.dao.excelsheet_dao import ExcelSheetReadDao, ExcelSheetAppendDao, ExcelSheetCreateDao
 
 
 class ExcelSheetReadService:
 
     def __init__(self,
-                 excel_file: str,
-                 sheet_index: int,
-                 start_now_index: int,
-                 ty_val: list[str],
-                 col_index: tuple[int, ...]) -> None:
+                 excelsheet_read: ExcelSheetReadModel) -> None:
 
-        self._excelsheet_read_dao = ExcelSheetReadDao(excel_file, sheet_index, start_now_index, col_index)
+        self._excelsheet_read_dao = ExcelSheetReadDao(excelsheet_read.excel_file,
+                                                      excelsheet_read.sheet_index,
+                                                      excelsheet_read.start_now_index,
+                                                      excelsheet_read.col_index)
 
-        self._ty_val = ty_val
-        self._col_index = col_index
+        self._ty_val = excelsheet_read.ty_val
+        self._col_index = excelsheet_read.col_index
 
 
     def load(self, n: int) -> Iterator[BillList]:
@@ -60,11 +61,11 @@ class ExcelSheetWriteService:
 class ExcelSheetCreateService(ExcelSheetWriteService):
 
     def __init__(self,
-                 sheet_file: str,
-                 new_name: str,
-                 index: int | None = None) -> None:
+                 excelsheet_create: ExcelSheetCreateModel) -> None:
 
-        self._excelsheet_create_dao = ExcelSheetCreateDao(excel_file = sheet_file, new_name = new_name, index = index)
+        self._excelsheet_create_dao = ExcelSheetCreateDao(excelsheet_create.sheet_file,
+                                                          excelsheet_create.new_name,
+                                                          excelsheet_create.index)
 
 
     def append(self, data: BillList) -> None:
@@ -94,10 +95,10 @@ class ExcelSheetCreateService(ExcelSheetWriteService):
 class ExcelSheetAppendService(ExcelSheetWriteService):
 
     def __init__(self,
-                 excel_file: str,
-                 index: int) -> None:
+                 excelsheet_append: ExcelSheetAppendModel) -> None:
 
-        self._excelsheet_append_dao = ExcelSheetAppendDao(excel_file, index)
+        self._excelsheet_append_dao = ExcelSheetAppendDao(excelsheet_append.excel_file,
+                                                          excelsheet_append.index)
 
 
     def append(self, data: BillList) -> None:
