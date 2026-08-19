@@ -8,17 +8,19 @@ class LLMClassifier(Classifier):
                  key: str,
                  model: str,
                  sys_prompt: str,
-                 user_prompt: str) -> None:
+                 user_prompt: str,
+                 category: list[str]) -> None:
 
         self.model = model
         self.sys_prompt = sys_prompt
         self.user_prompt = user_prompt
+        self.category = category
         self.client = OpenAI(base_url = url,
                              api_key = key,
                              max_retries = 3)
 
 
-    def classify(self, data: list[str], category: list[str]) -> tuple[str, ...]:
+    def classify(self, data: list[str]) -> tuple[str, ...]:
         response = self.client.chat.completions.create(
             model = self.model,
             messages = [    #  type: ignore
@@ -28,7 +30,7 @@ class LLMClassifier(Classifier):
                 },
                 {
                     'role': 'user',
-                    'content': self.user_prompt + '\n' + str(category)
+                    'content': self.user_prompt + '\n' + str(self.category)
                 },
                 {
                     'role': 'user',
