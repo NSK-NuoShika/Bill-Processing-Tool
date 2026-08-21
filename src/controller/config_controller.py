@@ -1,4 +1,4 @@
-from service.config_service import ConfigService
+from src.service.config_service import ConfigService
 from src.model.config_model import Config
 
 
