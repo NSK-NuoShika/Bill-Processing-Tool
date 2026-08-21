@@ -1,0 +1,96 @@
+name: Build Portable Releases
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows-x64
+            add_data_sep: ";"
+            pyinstaller_args: "--windowed"
+          - os: macos-latest
+            platform: macos-arm64
+            add_data_sep: ":"
+            pyinstaller_args: ""
+          - os: ubuntu-latest
+            platform: linux-x64
+            add_data_sep: ":"
+            pyinstaller_args: ""
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build executable
+        shell: bash
+        run: |
+          python -m PyInstaller \
+            --noconfirm \
+            --clean \
+            --onedir \
+            --name Bill-Processing-Tool \
+            --paths . \
+            --add-data "resources/sys_prompt.txt${{ matrix.add_data_sep }}resources" \
+            ${{ matrix.pyinstaller_args }} \
+            src/main.py
+
+      - name: Copy license files
+        shell: bash
+        run: |
+          cp LICENSE THIRD_PARTY_NOTICES.txt dist/Bill-Processing-Tool/
+
+      - name: Package portable archive
+        shell: bash
+        run: |
+          cd dist
+          python -m zipfile -c "Bill-Processing-Tool-${{ github.ref_name }}-${{ matrix.platform }}.zip" Bill-Processing-Tool
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bill-Processing-Tool-${{ github.ref_name }}-${{ matrix.platform }}
+          path: dist/Bill-Processing-Tool-${{ github.ref_name }}-${{ matrix.platform }}.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: release-assets/*.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
