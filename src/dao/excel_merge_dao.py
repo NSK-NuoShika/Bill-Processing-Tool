@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
@@ -25,8 +27,11 @@ class ExcelMergeDao:
 
 
     def _create(self) -> Workbook:
-        wb = Workbook()
-        wb.remove(wb.worksheets[0])
+        if not Path(self._to_excel_path).exists():
+            wb = Workbook()
+            wb.remove(wb.worksheets[0])
+        else:
+            wb = load_workbook(self._to_excel_path)
 
         return wb
 
