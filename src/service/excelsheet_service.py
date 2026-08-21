@@ -70,8 +70,8 @@ class ExcelSheetCreateService(ExcelSheetWriteService):
     def append(self, data: BillList) -> None:
         for br in data:
             time = br.time
-            party = br.party
-            product = br.product
+            party = str(br.party)
+            product = str(br.product)
 
             if br.ty == -1:
                 ty = 'outcome'
