@@ -1,7 +1,6 @@
 import tkinter as tk
-from tkinter.font import Font
 from typing import TYPE_CHECKING
-from src.ui.pages.home_page import HomePage
+
 
 if TYPE_CHECKING:
     from src.ui.mainwindow import MainWindow
